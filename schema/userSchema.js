@@ -21,6 +21,10 @@ const userTemplate = new mongoose.Schema({
     type: String,
     require: true,
   },
+  blood_grp: {
+    type: String,
+    require: false,
+  },
 });
 
 module.exports = mongoose.model("user", userTemplate);

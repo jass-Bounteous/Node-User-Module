@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
 
-const dbUrl =
-  "mongodb+srv://jassy:Ehstw8u6HnDOVPnl@cluster0.rwmx5.mongodb.net/usertask?retryWrites=true&w=majority";
-mongoose
-  .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("DB Connected!!"))
-  .catch((err) => console.log("Error: " + err));
+const DbConnect = () => {
+  const dbUrl = process.env.dbUrl;
+  mongoose
+    .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log("DB Connected!!"))
+    .catch((err) => console.log("Error: " + err));
+};
+
+module.exports = DbConnect;
