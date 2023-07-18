@@ -12,5 +12,5 @@ console.log("hello world!");
 
 DbConnect();
 
-app.use("/app", userRouter);
+app.use("/app/user", userRouter);
 app.listen(5000, () => console.log("App started!"));

@@ -5,19 +5,16 @@ const {
   getUserById,
   deleteUser,
   updateUser,
+  upsetUser,
 } = require("../controllers/userController");
 
 const userRouter = express.Router();
 
-// userRouter.route("/user").get((req, res) => {
-//   console.log("get route called");
-//   res.send("get route da bot uh");
-// });
-
-userRouter.get("/user", getUsers);
-userRouter.get("/user/:id", getUserById);
-userRouter.post("/user", addUser);
-userRouter.delete("/user/:id", deleteUser);
-userRouter.patch("/user/:id", updateUser);
+userRouter.get("/", getUsers);
+userRouter.get("/:id", getUserById);
+userRouter.post("/", addUser);
+userRouter.delete("/:id", deleteUser);
+userRouter.patch("/:id", updateUser);
+userRouter.put("/:id", upsetUser);
 
 module.exports = userRouter;
