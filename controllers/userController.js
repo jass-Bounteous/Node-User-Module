@@ -6,6 +6,7 @@ const {
 } = require("../services/userServices");
 
 const getUsers = (req, res) => {
+  console.log(req.user);
   userTemplateCopy
     .find()
     .then((data) => {

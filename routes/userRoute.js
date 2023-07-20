@@ -7,10 +7,11 @@ const {
   updateUser,
   upsetUser,
 } = require("../controllers/userController");
+const authenticate = require("../middleware/authenticate");
 
 const userRouter = express.Router();
 
-userRouter.get("/", getUsers);
+userRouter.get("/", authenticate, getUsers);
 userRouter.get("/:id", getUserById);
 userRouter.post("/", addUser);
 userRouter.delete("/:id", deleteUser);
