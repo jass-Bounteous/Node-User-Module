@@ -1,6 +1,6 @@
 const userTemplateCopy = require("../schema/userSchema");
 const {
-  isAllValid,
+  isInValid,
   checkUser,
   addUserService,
 } = require("../services/userServices");
@@ -31,6 +31,10 @@ const getUserById = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
+  // Check for Admin or Corresponding user
+  if (req.user.id == req.params.id && req.params.id == "000")
+    return res.status(401).json({ msg: "Unauthorized" });
+
   if (await checkUser(req.params.id)) {
     userTemplateCopy
       .findByIdAndRemove(req.params.id)
@@ -46,6 +50,9 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+  // Check for Admin or Corresponding user
+  if (req.user.id == req.params.id && req.params.id == "000")
+    return res.status(401).json({ msg: "Unauthorized" });
   if (await checkUser(req.params.id)) {
     try {
       const user = await userTemplateCopy.findById(req.params.id);
@@ -67,11 +74,16 @@ const updateUser = async (req, res) => {
   }
 };
 
-const upsetUser = async (req, res) => {
-  if (isAllValid(req.body)) {
+const upsertUser = async (req, res) => {
+  // Check for Admin or Corresponding user
+  if (req.user.id == req.params.id && req.params.id == "000")
+    return res.status(401).json({ msg: "Unauthorized" });
+
+  if (isInValid(req.body)) {
     res.status(400).json({ msg: "Bad request" });
     return;
   }
+
   try {
     if (await checkUser(req.params.id)) {
       const user = await userTemplateCopy.findById(req.params.id);
@@ -97,25 +109,10 @@ const upsetUser = async (req, res) => {
   }
 };
 
-const addUser = async (req, res) => {
-  const userData = req.body;
-  if (isAllValid(userData)) {
-    res.status(400).json({ msg: "Bad request" });
-    return;
-  }
-  try {
-    const resData = await addUserService(userData);
-    res.status(201).json({ msg: "User added successfully", data: resData });
-  } catch (err) {
-    res.status(400).json({ msg: "Err: " + err });
-  }
-};
-
 module.exports = {
   getUsers,
-  addUser,
   getUserById,
   deleteUser,
   updateUser,
-  upsetUser,
+  upsertUser,
 };

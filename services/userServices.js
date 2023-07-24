@@ -6,7 +6,7 @@ const addUserService = async (user) => {
   return resData;
 };
 
-const isAllValid = (data) => {
+const isInValid = (data) => {
   if (
     data.name &&
     data.mobile_no &&
@@ -25,4 +25,4 @@ const checkUser = async (id) => {
   return false;
 };
 
-module.exports = { addUserService, isAllValid, checkUser };
+module.exports = { addUserService, isInValid, checkUser };
