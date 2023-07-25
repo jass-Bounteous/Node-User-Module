@@ -2,6 +2,10 @@ const jwt = require("jsonwebtoken");
 const userTemplateCopy = require("../schema/userSchema");
 const bcrypt = require("bcrypt");
 const { isInValid, addUserService } = require("../services/userServices");
+const {
+  generateTokens,
+  generateAccessToken,
+} = require("../services/authServices");
 
 const login = async (req, res) => {
   const { emp_code, password } = req.body;
@@ -25,8 +29,10 @@ const login = async (req, res) => {
     }
   });
 
-  const accessToken = jwt.sign(req.body, process.env.ACCESS_TOKEN_SECRET);
-  res.json({ msg: "Welcome " + newObj.name, accessToken });
+  res.json({
+    msg: "Welcome " + newObj.name,
+    tokens: await generateTokens(req.body),
+  });
 };
 
 const signup = async (req, res) => {
@@ -50,4 +56,22 @@ const signup = async (req, res) => {
   }
 };
 
-module.exports = { login, signup };
+const refreshToken = async (req, res, next) => {
+  const refreshToken = req.body.token;
+  if (!refreshToken) res.status(401).json({ msg: "Bad request" });
+
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, user) => {
+      if (err) return res.status(500).json({ msg: "Error comparing tokens!" });
+
+      console.log(user);
+
+      const accessToken = await generateAccessToken(user);
+      res.status(200).json({ accessToken });
+    }
+  );
+};
+
+module.exports = { login, signup, refreshToken };
