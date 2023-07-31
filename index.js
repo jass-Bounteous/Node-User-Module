@@ -13,6 +13,6 @@ console.log("hello world!");
 
 DbConnect();
 
-app.use("/app/", authRouter);
 app.use("/app/user", userRouter);
+app.use("/app/", authRouter);
 app.listen(5000, () => console.log("App started!"));

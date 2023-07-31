@@ -45,7 +45,9 @@ const signup = async (req, res) => {
     // Check Duplication of Employee Code
     const dbUser = await userTemplateCopy.find({ emp_code: userData.emp_code });
     if (dbUser && dbUser.length > 0)
-      throw new Error("Employee code already exist, Try different code!");
+      res.status(400).json({
+        msg: "Employee code already exist, Recheck you Employee code",
+      });
     const saltPassword = await bcrypt.genSalt(10);
     userData.password = await bcrypt.hash(userData.password, saltPassword);
 
@@ -57,7 +59,7 @@ const signup = async (req, res) => {
 };
 
 const refreshToken = async (req, res, next) => {
-  const refreshToken = req.body.token;
+  const refreshToken = req.headers.token;
   if (!refreshToken) res.status(401).json({ msg: "Bad request" });
 
   jwt.verify(
