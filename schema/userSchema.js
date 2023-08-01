@@ -25,6 +25,10 @@ const userTemplate = new mongoose.Schema({
     type: String,
     require: false,
   },
+  authToken: {
+    type: String,
+    require: false,
+  },
 });
 
 module.exports = mongoose.model("user", userTemplate);

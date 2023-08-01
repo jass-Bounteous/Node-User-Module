@@ -1,22 +1,18 @@
 const userTemplateCopy = require("../schema/userSchema");
 
 const addUserService = async (user) => {
-  const resData = await userTemplateCopy.create(user).then((res) => res.data);
-
-  return resData;
+  const resData = await userTemplateCopy.create(user);
+  return resData.data;
 };
 
-const isAllValid = (data) => {
-  if (
+const isInValid = (data) => {
+  return !(
     data.name &&
     data.mobile_no &&
     data.email &&
     data.password &&
     data.emp_code
-  ) {
-    return false;
-  }
-  return true;
+  );
 };
 
 const checkUser = async (id) => {
@@ -25,4 +21,4 @@ const checkUser = async (id) => {
   return false;
 };
 
-module.exports = { addUserService, isAllValid, checkUser };
+module.exports = { addUserService, isInValid, checkUser };
