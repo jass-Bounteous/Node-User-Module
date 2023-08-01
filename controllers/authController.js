@@ -8,33 +8,39 @@ const {
 } = require("../services/authServices");
 
 const login = async (req, res) => {
-  const { emp_code, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!(emp_code && password))
-    return res.status(400).json({ msg: "Bad Request" });
+  if (!(email && password)) return res.status(400).json({ msg: "Bad Request" });
 
-  const dbUser = await userTemplateCopy.find({ emp_code });
+  const dbUser = await userTemplateCopy.findOne({ email }); // Use findOne instead of find
 
-  if (!dbUser) return res.status(401).json({ msg: "Invalid Employee Code" });
+  if (!dbUser) return res.status(401).json({ msg: "Invalid Email" });
 
-  let newObj = { ...dbUser }[0];
-
-  bcrypt.compare(newObj.password, password, (err, result) => {
+  bcrypt.compare(password, dbUser.password, async (err, result) => {
     if (err) {
-      res.status(500).json({ msg: "Error comparing passwords:", err });
+      return res.status(500).json({ msg: "Error comparing passwords:", err });
     } else {
       if (!result) {
-        res.status(401).json({ msg: "Invalid Password", err });
+        return res.status(401).json({ msg: "Invalid Password" });
+      } else {
+        const tokens = await generateTokens({ ...dbUser });
+
+        // Update authToken in DB
+        const updatedData = await userTemplateCopy.findOneAndUpdate(
+          { email },
+          { $set: { authToken: tokens.accessToken } },
+          { new: true }
+        );
+
+        return res.json({
+          msg: "Welcome " + dbUser.name,
+          data: updatedData,
+          tokens,
+        });
       }
     }
   });
-
-  res.json({
-    msg: "Welcome " + newObj.name,
-    tokens: await generateTokens(req.body),
-  });
 };
-
 const signup = async (req, res) => {
   const userData = req.body;
   if (isInValid(userData)) {
@@ -43,10 +49,11 @@ const signup = async (req, res) => {
   }
   try {
     // Check Duplication of Employee Code
-    const dbUser = await userTemplateCopy.find({ emp_code: userData.emp_code });
-    if (dbUser && dbUser.length > 0)
-      res.status(400).json({
-        msg: "Employee code already exist, Recheck you Employee code",
+    const dbUser = await userTemplateCopy.findOne({ email: userData.email });
+    console.log(dbUser);
+    if (dbUser)
+      return res.status(400).json({
+        msg: "This Email has already been registered",
       });
     const saltPassword = await bcrypt.genSalt(10);
     userData.password = await bcrypt.hash(userData.password, saltPassword);
@@ -68,10 +75,16 @@ const refreshToken = async (req, res, next) => {
     async (err, user) => {
       if (err) return res.status(500).json({ msg: "Error comparing tokens!" });
 
-      console.log(user);
-
       const accessToken = await generateAccessToken(user);
-      res.status(200).json({ accessToken });
+
+      // Update authToken in DB
+      const updatedData = await userTemplateCopy.findOneAndUpdate(
+        { email: user._doc.email },
+        { $set: { authToken: accessToken } },
+        { new: true }
+      );
+
+      res.status(200).json({ accessToken, updatedData });
     }
   );
 };

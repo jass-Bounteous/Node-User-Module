@@ -1,22 +1,18 @@
 const userTemplateCopy = require("../schema/userSchema");
 
 const addUserService = async (user) => {
-  const resData = await userTemplateCopy.create(user).then((res) => res.data);
-
-  return resData;
+  const resData = await userTemplateCopy.create(user);
+  return resData.data;
 };
 
 const isInValid = (data) => {
-  if (
+  return !(
     data.name &&
     data.mobile_no &&
     data.email &&
     data.password &&
     data.emp_code
-  ) {
-    return false;
-  }
-  return true;
+  );
 };
 
 const checkUser = async (id) => {

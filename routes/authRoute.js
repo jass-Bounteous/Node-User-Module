@@ -1,9 +1,13 @@
 const express = require("express");
-const { login, signup,refreshToken } = require("../controllers/authController");
+const {
+  login,
+  signup,
+  refreshToken,
+} = require("../controllers/authController");
 
 const authRouter = express.Router();
 
-authRouter.post("/", login);
+authRouter.post("/login", login);
 authRouter.post("/signup", signup);
 authRouter.post("/refreshToken", refreshToken);
 
